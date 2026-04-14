@@ -1,5 +1,4 @@
 from tools.base import BaseTool
-from utils.embeddings import embed_text
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -31,6 +30,8 @@ class SearchDocsTool(BaseTool):
     def run(self, input: str) -> str:
         try:
             import json
+            from sqlalchemy import text
+
             try:
                 data = json.loads(input)
                 query = data.get("query", input)
@@ -40,29 +41,41 @@ class SearchDocsTool(BaseTool):
             if not self.db_session:
                 return "No database connection available for document search."
 
-            query_embedding = embed_text(query)
-
-            from database.models import DocumentChunk
-            from sqlalchemy import text
-
+            # Use PostgreSQL full-text search — no ML model needed
             result = self.db_session.execute(
                 text(
                     """
-                    SELECT content FROM document_chunks
+                    SELECT content,
+                           ts_rank(to_tsvector('english', content),
+                                   plainto_tsquery('english', :query)) AS rank
+                    FROM document_chunks
                     WHERE agent_id = :agent_id
-                    ORDER BY embedding <=> cast(:embedding as vector)
+                      AND to_tsvector('english', content) @@ plainto_tsquery('english', :query)
+                    ORDER BY rank DESC
                     LIMIT 5
                     """
                 ),
-                {
-                    "agent_id": self.agent_id,
-                    "embedding": str(query_embedding),
-                },
+                {"agent_id": self.agent_id, "query": query},
             )
             chunks = result.fetchall()
 
+            # Fallback: if FTS returns nothing, grab the most recent chunks
             if not chunks:
-                return "No relevant documents found for this query."
+                result = self.db_session.execute(
+                    text(
+                        """
+                        SELECT content FROM document_chunks
+                        WHERE agent_id = :agent_id
+                        ORDER BY chunk_index ASC
+                        LIMIT 5
+                        """
+                    ),
+                    {"agent_id": self.agent_id},
+                )
+                chunks = result.fetchall()
+
+            if not chunks:
+                return "No documents found in the knowledge base for this agent."
 
             passages = [row[0] for row in chunks]
             return "\n\n---\n\n".join(passages)

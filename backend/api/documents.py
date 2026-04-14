@@ -2,16 +2,29 @@ import uuid
 import io
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from database.connection import get_db
 from database.models import Document, DocumentChunk, Agent
 from api.auth import get_current_user, User
-from utils.embeddings import embed_texts
 from utils.logger import get_logger
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 logger = get_logger(__name__)
+
+
+def _split_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
+    """Split text into overlapping chunks without any external dependencies."""
+    if not text:
+        return []
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = min(start + chunk_size, len(text))
+        chunks.append(text[start:end])
+        if end == len(text):
+            break
+        start = end - overlap
+    return chunks
 
 
 def extract_text(filename: str, content: bytes) -> str:
@@ -58,13 +71,8 @@ async def upload_document(
     if not text.strip():
         raise HTTPException(status_code=400, detail="Could not extract text from file")
 
-    # Split into chunks
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
-        length_function=len,
-    )
-    chunks = splitter.split_text(text)
+    # Split into chunks (simple built-in splitter — no external deps)
+    chunks = _split_text(text, chunk_size=500, overlap=50)
 
     # Create document record
     doc = Document(
@@ -77,22 +85,14 @@ async def upload_document(
     db.add(doc)
     db.flush()
 
-    # Generate embeddings in batch
-    try:
-        embeddings = embed_texts(chunks)
-    except Exception as e:
-        logger.error("embedding_error", error=str(e))
-        # Store without embeddings if OpenAI unavailable
-        embeddings = [None] * len(chunks)
-
-    # Store chunks
-    for i, (chunk_text, embedding) in enumerate(zip(chunks, embeddings)):
+    # Store chunks (no embeddings — using PostgreSQL FTS for search)
+    for i, chunk_text in enumerate(chunks):
         chunk = DocumentChunk(
             id=uuid.uuid4(),
             document_id=doc.id,
             agent_id=uuid.UUID(agent_id),
             content=chunk_text,
-            embedding=embedding,
+            embedding=None,
             chunk_index=i,
         )
         db.add(chunk)
