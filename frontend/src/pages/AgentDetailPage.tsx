@@ -235,20 +235,19 @@ function WebhookTab({ agentId, agentStatus }: { agentId: string; agentStatus: st
         <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-800 overflow-auto">{examplePayload}</pre>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-        <h3 className="font-semibold text-gray-900">How to connect</h3>
-        <div className="space-y-3">
-          {[
-            { tool: 'Zapier', steps: 'New Zap → Trigger: Gmail (New Email) → Action: Webhooks by Zapier → POST to your URL above' },
-            { tool: 'Make.com', steps: 'New Scenario → Gmail module (Watch Emails) → HTTP module → POST to your URL above' },
-            { tool: 'cURL (test)', steps: `curl -X POST ${webhookUrl} -H "Content-Type: application/json" -d '{"from":"test@example.com","subject":"Test","body":"Hello"}'` },
-          ].map(({ tool, steps }) => (
-            <div key={tool} className="border border-gray-100 rounded-lg p-3">
-              <p className="text-sm font-medium text-gray-800 mb-1">{tool}</p>
-              <p className="text-xs text-gray-500 font-mono">{steps}</p>
-            </div>
-          ))}
-        </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        <p className="text-sm font-semibold text-blue-900 mb-1">💡 Use Email trigger instead for Gmail</p>
+        <p className="text-sm text-blue-800">
+          Go to <strong>Edit Agent → Step 2 → Email trigger</strong> and Orstra will automatically watch your inbox
+          every 2 minutes — no external tools needed. The webhook URL above is for custom integrations.
+        </p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+        <h3 className="font-semibold text-gray-900">Test with cURL</h3>
+        <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-800 overflow-auto whitespace-pre-wrap">{`curl -X POST ${webhookUrl} \\
+  -H "Content-Type: application/json" \\
+  -d '{"from":"test@example.com","subject":"Test","body":"Hello"}'`}</pre>
       </div>
     </div>
   )

@@ -8,9 +8,9 @@ interface Props {
 }
 
 const TRIGGERS = [
-  { type: 'email', icon: Mail, label: 'New Email', description: 'Triggers when a new email arrives in a monitored inbox' },
-  { type: 'schedule', icon: Clock, label: 'Schedule', description: 'Runs automatically on a cron schedule' },
-  { type: 'webhook', icon: Webhook, label: 'Webhook', description: 'Triggers when a POST request is received' },
+  { type: 'email', icon: Mail, label: 'New Email', description: 'Orstra watches your Gmail inbox and fires this agent when a new email arrives — no Zapier needed' },
+  { type: 'schedule', icon: Clock, label: 'Schedule', description: 'Runs automatically on a timer (every hour, daily, weekly, etc.)' },
+  { type: 'webhook', icon: Webhook, label: 'Webhook', description: 'Any external tool can POST to a URL to trigger this agent' },
 ]
 
 const CRON_PRESETS = [
@@ -58,20 +58,28 @@ export default function StepTrigger({ data, onChange }: Props) {
       </div>
 
       {data.trigger_type === 'email' && (
-        <div className="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div className="space-y-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <div className="flex items-start gap-2 mb-1">
+            <span className="text-blue-600 text-lg">⚡</span>
+            <p className="text-sm text-blue-800 font-medium">
+              Orstra will check your Gmail inbox every 2 minutes and automatically run this agent on new emails.
+              Make sure your Gmail is connected in <strong>Connectors</strong>.
+            </p>
+          </div>
           <Input
-            label="Email Inbox to Monitor"
+            label="Gmail inbox to watch"
             type="email"
             value={data.trigger_config.inbox || ''}
             onChange={(e) => setConfig('inbox', e.target.value)}
             placeholder="support@yourcompany.com"
+            hint="Must match the Gmail account connected in Connectors"
           />
           <Input
-            label="Filter by Subject Keywords (optional)"
-            value={data.trigger_config.subject_filter || ''}
-            onChange={(e) => setConfig('subject_filter', e.target.value)}
+            label="Filter by subject keywords (optional)"
+            value={data.trigger_config.subject_keywords || ''}
+            onChange={(e) => setConfig('subject_keywords', e.target.value)}
             placeholder="e.g. order, refund, help"
-            hint="Comma-separated keywords. Leave blank to process all emails."
+            hint="Comma-separated. Leave blank to trigger on ALL incoming emails."
           />
         </div>
       )}

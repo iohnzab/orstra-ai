@@ -57,7 +57,16 @@ async def global_exception_handler(request: Request, exc: Exception):
 async def startup():
     logger.info("app_starting")
     create_tables()
+    from core.scheduler import start_scheduler
+    start_scheduler()
     logger.info("app_started")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    from core.scheduler import stop_scheduler
+    stop_scheduler()
+    logger.info("app_stopped")
 
 
 app.include_router(auth_router)
