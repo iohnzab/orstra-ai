@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useStore } from './store/useStore'
 import { getStoredUser, isAuthenticated } from './lib/auth'
 import Layout from './components/layout/Layout'
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import AgentsPage from './pages/AgentsPage'
@@ -27,9 +28,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public landing page — redirect to dashboard if already logged in */}
+        <Route path="/" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
-          path="/"
+          path="/dashboard"
           element={
             <RequireAuth>
               <Layout />
@@ -37,12 +40,12 @@ export default function App() {
           }
         >
           <Route index element={<DashboardPage />} />
-          <Route path="agents" element={<AgentsPage />} />
-          <Route path="agents/new" element={<AgentBuilderPage />} />
-          <Route path="agents/:id/edit" element={<AgentBuilderPage />} />
-          <Route path="agents/:id" element={<AgentDetailPage />} />
-          <Route path="connectors" element={<ConnectorsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route path="/agents" element={<AgentsPage />} />
+          <Route path="/agents/new" element={<AgentBuilderPage />} />
+          <Route path="/agents/:id/edit" element={<AgentBuilderPage />} />
+          <Route path="/agents/:id" element={<AgentDetailPage />} />
+          <Route path="/connectors" element={<ConnectorsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

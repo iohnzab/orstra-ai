@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key"
     encryption_key: str = ""
     debug: bool = True
+    api_base_url: str = "https://orstra-ai.onrender.com"
 
     # Database
     database_url: str = "postgresql://orstra:orstra_password@localhost:5432/orstra"

@@ -27,7 +27,7 @@ export default function LoginPage() {
           : await authApi.signup(email, password, name)
       saveAuth(res)
       setUser({ id: res.user_id, email: res.email })
-      navigate('/')
+      navigate('/dashboard')
     } catch (err: any) {
       toast.error(err.response?.data?.detail || 'Authentication failed')
     } finally {

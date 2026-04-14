@@ -13,6 +13,7 @@ from api.runs import router as runs_router
 from api.test_run import router as test_router
 from api.documents import router as documents_router
 from api.settings import router as settings_router
+from api.webhooks import router as webhooks_router
 from tools.registry import ALL_TOOL_DEFINITIONS
 
 settings = get_settings()
@@ -66,6 +67,7 @@ app.include_router(runs_router)
 app.include_router(test_router)
 app.include_router(documents_router)
 app.include_router(settings_router)
+app.include_router(webhooks_router)
 
 
 @app.get("/")

@@ -7,7 +7,7 @@ import RunLogList from '../components/dashboard/RunLogList'
 import Button from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import EmptyState from '../components/shared/EmptyState'
-import { Pencil, FileText, Upload, Trash2, History, RotateCcw } from 'lucide-react'
+import { Pencil, FileText, Upload, Trash2, History, RotateCcw, Copy, Check, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
 import { useDropzone } from 'react-dropzone'
@@ -187,13 +187,80 @@ function DocumentsTab({ agentId }: { agentId: string }) {
   )
 }
 
+// ─── Webhook Tab ─────────────────────────────────────────────────────────────
+function WebhookTab({ agentId, agentStatus }: { agentId: string; agentStatus: string }) {
+  const [copied, setCopied] = useState(false)
+  const API_URL = import.meta.env.VITE_API_URL || 'https://orstra-ai.onrender.com'
+  const webhookUrl = `${API_URL}/webhooks/agent/${agentId}`
+
+  function copy() {
+    navigator.clipboard.writeText(webhookUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const examplePayload = JSON.stringify({
+    from: "customer@example.com",
+    subject: "I need help",
+    body: "Hi, I have a question about my order."
+  }, null, 2)
+
+  return (
+    <div className="space-y-6">
+      {agentStatus !== 'active' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+          <p className="text-sm text-yellow-800 font-medium">Agent must be deployed (active) to receive webhook calls.</p>
+          <p className="text-xs text-yellow-700 mt-1">Go to Edit → Deploy Agent to activate it.</p>
+        </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Zap size={16} className="text-brand-500" />
+          <h3 className="font-semibold text-gray-900">Your Webhook URL</h3>
+        </div>
+        <p className="text-sm text-gray-500">Send a POST request to this URL from Zapier, Make, Gmail, or any external tool to trigger this agent.</p>
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+          <code className="flex-1 text-xs text-gray-800 break-all">{webhookUrl}</code>
+          <button onClick={copy} className="shrink-0 text-gray-400 hover:text-brand-500 transition-colors">
+            {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+          </button>
+        </div>
+        <p className="text-xs text-gray-400">Method: <strong>POST</strong> · Content-Type: <strong>application/json</strong></p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+        <h3 className="font-semibold text-gray-900">Example Payload</h3>
+        <p className="text-sm text-gray-500">Send any JSON data — the agent will read it as the trigger input.</p>
+        <pre className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-800 overflow-auto">{examplePayload}</pre>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+        <h3 className="font-semibold text-gray-900">How to connect</h3>
+        <div className="space-y-3">
+          {[
+            { tool: 'Zapier', steps: 'New Zap → Trigger: Gmail (New Email) → Action: Webhooks by Zapier → POST to your URL above' },
+            { tool: 'Make.com', steps: 'New Scenario → Gmail module (Watch Emails) → HTTP module → POST to your URL above' },
+            { tool: 'cURL (test)', steps: `curl -X POST ${webhookUrl} -H "Content-Type: application/json" -d '{"from":"test@example.com","subject":"Test","body":"Hello"}'` },
+          ].map(({ tool, steps }) => (
+            <div key={tool} className="border border-gray-100 rounded-lg p-3">
+              <p className="text-sm font-medium text-gray-800 mb-1">{tool}</p>
+              <p className="text-xs text-gray-500 font-mono">{steps}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AgentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
 
-  const [activeTab, setActiveTab] = useState<'activity' | 'documents'>('activity')
+  const [activeTab, setActiveTab] = useState<'activity' | 'documents' | 'webhook'>('activity')
   const [testOpen, setTestOpen] = useState(false)
   const [versionsOpen, setVersionsOpen] = useState(false)
 
@@ -231,7 +298,7 @@ export default function AgentDetailPage() {
   }
   if (!agent) return <p className="text-center text-gray-500 mt-16">Agent not found</p>
 
-  const TABS = ['activity', 'documents'] as const
+  const TABS = ['activity', 'documents', 'webhook'] as const
 
   return (
     <div className="space-y-5">
@@ -286,6 +353,7 @@ export default function AgentDetailPage() {
       )}
 
       {activeTab === 'documents' && <DocumentsTab agentId={id!} />}
+      {activeTab === 'webhook' && <WebhookTab agentId={id!} agentStatus={agent.status} />}
 
       {/* Test run modal */}
       <Modal open={testOpen} onClose={() => setTestOpen(false)} title="Test Agent" size="lg">

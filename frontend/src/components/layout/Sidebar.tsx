@@ -3,7 +3,7 @@ import { LayoutDashboard, Bot, Plug, Settings, Zap } from 'lucide-react'
 import clsx from 'clsx'
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard', end: true },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/agents', icon: Bot, label: 'Agents' },
   { to: '/connectors', icon: Plug, label: 'Connectors' },
   { to: '/settings', icon: Settings, label: 'Settings' },
