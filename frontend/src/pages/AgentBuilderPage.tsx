@@ -35,16 +35,21 @@ export default function AgentBuilderPage() {
   const [step, setStep] = useState(1)
   const [data, setData] = useState<Partial<Agent>>(INITIAL)
   const [saving, setSaving] = useState(false)
+  const [initialized, setInitialized] = useState(false)
 
   const { data: existing } = useQuery({
     queryKey: ['agent', id],
     queryFn: () => agentsApi.get(id!),
     enabled: isEdit,
+    staleTime: Infinity, // don't refetch while editing — it would reset form changes
   })
 
   useEffect(() => {
-    if (existing) setData(existing)
-  }, [existing])
+    if (existing && !initialized) {
+      setData(existing)
+      setInitialized(true)
+    }
+  }, [existing, initialized])
 
   function patch(partial: Partial<Agent>) {
     setData((prev) => ({ ...prev, ...partial }))
