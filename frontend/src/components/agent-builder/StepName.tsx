@@ -7,11 +7,10 @@ interface Props {
 
 const INDUSTRIES = ['ecommerce', 'saas', 'marketing', 'hr', 'other']
 
-const AI_MODELS = [
-  { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku — Fast & affordable (Recommended)' },
-  { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet — Smarter & more capable' },
-  { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus — Most powerful' },
-  { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku — Fastest & cheapest' },
+const MODEL_SUGGESTIONS = [
+  { value: 'claude-3-7-sonnet-20250219', label: 'claude-3-7-sonnet-20250219 — Latest Sonnet (Recommended)' },
+  { value: 'claude-3-5-haiku-20241022', label: 'claude-3-5-haiku-20241022 — Fast & cheap' },
+  { value: 'claude-3-opus-20240229', label: 'claude-3-opus-20240229 — Most powerful (older)' },
 ]
 
 export default function StepName({ data, onChange }: Props) {
@@ -53,24 +52,37 @@ export default function StepName({ data, onChange }: Props) {
         >
           <option value="">Select industry</option>
           {INDUSTRIES.map((ind) => (
-            <option key={ind} value={ind} className="capitalize">{ind.charAt(0).toUpperCase() + ind.slice(1)}</option>
+            <option key={ind} value={ind}>{ind.charAt(0).toUpperCase() + ind.slice(1)}</option>
           ))}
         </select>
       </div>
 
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700">AI Model</label>
-        <select
+        <input
+          list="model-suggestions"
           className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
           value={data.ai_model}
           onChange={(e) => onChange({ ai_model: e.target.value })}
-        >
-          <option value="">Use default model</option>
-          {AI_MODELS.map((m) => (
+          placeholder="e.g. claude-3-7-sonnet-20250219"
+        />
+        <datalist id="model-suggestions">
+          {MODEL_SUGGESTIONS.map((m) => (
             <option key={m.value} value={m.value}>{m.label}</option>
           ))}
-        </select>
-        <p className="text-xs text-gray-400 mt-1">Choose the Claude model this agent will use. Haiku is faster and cheaper; Sonnet/Opus are smarter.</p>
+        </datalist>
+        <p className="text-xs text-gray-400 mt-1">
+          Type any model name from{' '}
+          <a
+            href="https://docs.anthropic.com/en/docs/about-claude/models"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-500 underline"
+          >
+            Anthropic's model list
+          </a>
+          , or pick a suggestion. Leave blank to use the platform default.
+        </p>
       </div>
 
       <div className="space-y-1">
