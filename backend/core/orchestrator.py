@@ -19,11 +19,11 @@ class AgentOrchestrator:
         self.tool_registry = ToolRegistry()
 
     def _get_planner(self, agent: Agent) -> Planner:
-        """Get planner using the agent owner's API key."""
+        """Get planner using the agent owner's API key and the agent's chosen model."""
         from api.settings import get_user_api_key
         user = self.db.query(User).filter(User.id == agent.user_id).first()
         api_key = get_user_api_key(user) if user else None
-        return Planner(api_key=api_key)
+        return Planner(api_key=api_key, model=agent.ai_model or None)
 
     def run(
         self,

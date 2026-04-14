@@ -34,6 +34,7 @@ class Agent(Base):
     trigger_config = Column(JSON, default=dict)
     tools_enabled = Column(JSON, default=list)
     system_prompt = Column(Text, nullable=True)
+    ai_model = Column(String, nullable=True)  # e.g. claude-3-5-haiku-20241022
     guardrails = Column(JSON, default=list)
     version = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)

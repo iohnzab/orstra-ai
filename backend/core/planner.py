@@ -16,11 +16,12 @@ def calculate_cost(input_tokens: int, output_tokens: int) -> float:
 
 
 class Planner:
-    def __init__(self, api_key: str | None = None):
+    def __init__(self, api_key: str | None = None, model: str | None = None):
         key = api_key or settings.anthropic_api_key
         if not key:
             raise ValueError("No Anthropic API key available. Please add your API key in Settings.")
         self.client = anthropic.Anthropic(api_key=key)
+        self.model = model or settings.anthropic_model
 
     def plan(
         self,
@@ -62,7 +63,7 @@ Respond with ONLY valid JSON in exactly this format (no markdown, no extra text)
 }}"""
 
         response = self.client.messages.create(
-            model=settings.anthropic_model,
+            model=self.model,
             max_tokens=512,
             system=system,
             messages=[
@@ -146,7 +147,7 @@ Respond with ONLY valid JSON (no markdown, no extra text):
 }}"""
 
         response = self.client.messages.create(
-            model=settings.anthropic_model,
+            model=self.model,
             max_tokens=1024,
             system=system,
             messages=[

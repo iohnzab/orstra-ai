@@ -14,6 +14,7 @@ export interface Agent {
   trigger_config: Record<string, unknown>
   tools_enabled: string[]
   system_prompt?: string
+  ai_model?: string
   guardrails: GuardrailRule[]
   version: number
   created_at: string

@@ -20,6 +20,7 @@ class AgentCreate(BaseModel):
     trigger_config: dict = {}
     tools_enabled: list[str] = []
     system_prompt: str | None = None
+    ai_model: str | None = None
     guardrails: list[dict] = []
 
 
@@ -57,6 +58,7 @@ def agent_to_response(agent: Agent) -> dict:
         "trigger_config": agent.trigger_config or {},
         "tools_enabled": agent.tools_enabled or [],
         "system_prompt": agent.system_prompt,
+        "ai_model": agent.ai_model,
         "guardrails": agent.guardrails or [],
         "version": agent.version,
         "created_at": agent.created_at.isoformat(),
@@ -83,6 +85,7 @@ def create_agent(req: AgentCreate, current_user: User = Depends(get_current_user
         trigger_config=req.trigger_config,
         tools_enabled=req.tools_enabled,
         system_prompt=req.system_prompt,
+        ai_model=req.ai_model,
         guardrails=req.guardrails,
         version=1,
         updated_at=datetime.utcnow(),
@@ -130,6 +133,7 @@ def update_agent(
     agent.trigger_config = req.trigger_config
     agent.tools_enabled = req.tools_enabled
     agent.system_prompt = req.system_prompt
+    agent.ai_model = req.ai_model
     agent.guardrails = req.guardrails
     agent.version = agent.version + 1
     agent.updated_at = datetime.utcnow()

@@ -19,6 +19,7 @@ const INITIAL: Partial<Agent> = {
   description: '',
   industry: '',
   system_prompt: '',
+  ai_model: '',
   trigger_type: '',
   trigger_config: {},
   tools_enabled: [],
@@ -110,7 +111,7 @@ export default function AgentBuilderPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         {step === 1 && (
           <StepName
-            data={{ name: data.name || '', description: data.description || '', industry: data.industry || '', system_prompt: data.system_prompt || '' }}
+            data={{ name: data.name || '', description: data.description || '', industry: data.industry || '', system_prompt: data.system_prompt || '', ai_model: data.ai_model || '' }}
             onChange={patch}
           />
         )}
