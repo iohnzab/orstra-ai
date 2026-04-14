@@ -28,18 +28,13 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public landing page — redirect to dashboard if already logged in */}
+        {/* Public routes */}
         <Route path="/" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <Layout />
-            </RequireAuth>
-          }
-        >
-          <Route index element={<DashboardPage />} />
+
+        {/* Protected routes — all wrapped in RequireAuth + Layout */}
+        <Route element={<RequireAuth><Layout /></RequireAuth>}>
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/agents" element={<AgentsPage />} />
           <Route path="/agents/new" element={<AgentBuilderPage />} />
           <Route path="/agents/:id/edit" element={<AgentBuilderPage />} />
