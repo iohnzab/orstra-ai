@@ -68,7 +68,7 @@ export default function RunLog({ run }: { run: TaskRun }) {
           {run.output?.content && (
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Output</p>
-              <p className="text-xs bg-white border border-gray-200 rounded p-2">{String(run.output.content)}</p>
+              <p className="text-xs bg-white border border-gray-200 rounded p-2">{String(run.output.content as string)}</p>
             </div>
           )}
           {run.escalation_reason && (
