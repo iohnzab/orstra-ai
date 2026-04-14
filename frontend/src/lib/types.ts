@@ -56,7 +56,7 @@ export interface TaskRun {
   ai_calls: AiCall[]
   escalated: boolean
   escalation_reason?: string
-  output: Record<string, unknown>
+  output: Record<string, string | number | boolean | null | undefined>
   cost_usd: number
   duration_ms?: number
   error?: string
