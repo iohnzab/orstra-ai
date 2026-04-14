@@ -76,6 +76,11 @@ export default function RunLog({ run }: { run: TaskRun }) {
               <p className="text-xs text-yellow-800"><strong>Escalated:</strong> {run.escalation_reason}</p>
             </div>
           )}
+          {run.error && (
+            <div className="bg-red-50 border border-red-200 rounded p-2">
+              <p className="text-xs text-red-800"><strong>Error:</strong> {run.error}</p>
+            </div>
+          )}
         </div>
       )}
     </div>
