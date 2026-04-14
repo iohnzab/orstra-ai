@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # Anthropic (Claude)
     anthropic_api_key: str = ""
-    anthropic_model: str = "claude-3-5-sonnet-20241022"
+    anthropic_model: str = "claude-3-5-haiku-20241022"
 
     # Google
     google_client_id: str = ""
